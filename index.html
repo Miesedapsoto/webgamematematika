@@ -1,0 +1,250 @@
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Matematika</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+        .bg-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+        .btn-secondary {
+            background: linear-gradient(135deg, #34d399 0%, #3b82f6 100%);
+        }
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #3b82f6 0%, #34d399 100%);
+        }
+        .btn-reset {
+            background: linear-gradient(135deg, #f87171 0%, #fbbf24 100%);
+        }
+        .btn-reset:hover {
+            background: linear-gradient(135deg, #fbbf24 0%, #f87171 100%);
+        }
+    </style>
+</head>
+<body class="bg-gradient flex items-center justify-center min-h-screen">
+    <div id="login-card" class="card p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">Login</h1>
+        <div class="mb-4">
+            <input type="text" id="username" class="border p-3 w-full mb-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Username">
+            <input type="password" id="password" class="border p-3 w-full mb-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Password">
+            <button id="login-button" class="btn-primary text-white py-3 px-4 rounded-lg w-full font-semibold">Login</button>
+        </div>
+    </div>
+
+    <div id="difficulty-card" class="card p-8 rounded-lg shadow-lg w-full max-w-md hidden">
+        <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">Pilih Kesulitan</h1>
+        <div class="mb-4">
+            <button id="easy-button" class="btn-primary text-white py-3 px-4 rounded-lg w-full font-semibold mb-4">Mudah</button>
+            <button id="medium-button" class="btn-primary text-white py-3 px-4 rounded-lg w-full font-semibold mb-4">Lumayan</button>
+            <button id="hard-button" class="btn-primary text-white py-3 px-4 rounded-lg w-full font-semibold">Sulit</button>
+        </div>
+    </div>
+
+    <div id="game-card" class="card p-8 rounded-lg shadow-lg w-full max-w-md hidden">
+        <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">Game Matematika</h1>
+        <div id="player-info" class="mb-4 text-center">
+            <p class="text-xl text-gray-700">Pemain: <span id="player-name"></span></p>
+        </div>
+        <div id="game" class="mb-4">
+            <p class="text-xl mb-4 text-gray-700" id="question">Pertanyaan akan muncul di sini</p>
+            <input type="number" id="answer" class="border p-3 w-full mb-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Masukkan jawaban">
+            <button id="submit" class="btn-primary text-white py-3 px-4 rounded-lg w-full font-semibold">Kirim Jawaban</button>
+        </div>
+        <div id="result" class="hidden">
+            <p class="text-xl mb-4 text-gray-700" id="result-message">Hasil akan muncul di sini</p>
+            <p class="text-lg mb-4 text-gray-700" id="correct-answer">Jawaban yang benar: <span id="correct-answer-value"></span></p>
+            <p class="text-lg mb-4 text-gray-700" id="user-answer">Jawaban Anda: <span id="user-answer-value"></span></p>
+            <button id="next" class="btn-secondary text-white py-3 px-4 rounded-lg w-full font-semibold">Soal Selanjutnya</button>
+        </div>
+        <div id="scoreboard" class="mt-8 text-center">
+            <p class="text-xl text-gray-700">Skor: <span id="score">0</span></p>
+            <p class="text-lg text-gray-700">Jawaban Benar: <span id="correct-count">0</span></p>
+            <p class="text-lg text-gray-700">Jawaban Salah: <span id="wrong-count">0</span></p>
+            <button id="reset-score" class="btn-reset text-white py-2 px-4 rounded-lg mt-4">Reset Skor</button>
+        </div>
+    </div>
+
+    <audio id="background-music" loop>
+        <source src="https://www.bensound.com/bensound-music/bensound-ukulele.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script>
+        const loginCard = document.getElementById('login-card');
+        const difficultyCard = document.getElementById('difficulty-card');
+        const gameCard = document.getElementById('game-card');
+        const loginButton = document.getElementById('login-button');
+        const backgroundMusic = document.getElementById('background-music');
+
+        const easyButton = document.getElementById('easy-button');
+        const mediumButton = document.getElementById('medium-button');
+        const hardButton = document.getElementById('hard-button');
+
+        const gameElement = document.getElementById('game');
+        const resultElement = document.getElementById('result');
+        const questionElement = document.getElementById('question');
+        const answerElement = document.getElementById('answer');
+        const resultMessageElement = document.getElementById('result-message');
+        const correctAnswerElement = document.getElementById('correct-answer-value');
+        const userAnswerElement = document.getElementById('user-answer-value');
+        const submitButton = document.getElementById('submit');
+        const nextButton = document.getElementById('next');
+        const scoreElement = document.getElementById('score');
+        const correctCountElement = document.getElementById('correct-count');
+        const wrongCountElement = document.getElementById('wrong-count');
+        const resetScoreButton = document.getElementById('reset-score');
+        const playerNameElement = document.getElementById('player-name');
+
+        let currentQuestion = {};
+        let score = 0;
+        let correctCount = 0;
+        let wrongCount = 0;
+        let difficulty = 'easy';
+        let playerName = '';
+        let questionNumber = 1;
+
+        function generateQuestion() {
+            const operations = ['+', '-', '*', '/'];
+            let num1, num2;
+
+            switch (difficulty) {
+                case 'easy':
+                    num1 = Math.floor(Math.random() * 10) + 1;
+                    num2 = Math.floor(Math.random() * 10) + 1;
+                    break;
+                case 'medium':
+                    num1 = Math.floor(Math.random() * 50) + 1;
+                    num2 = Math.floor(Math.random() * 50) + 1;
+                    break;
+                case 'hard':
+                    num1 = Math.floor(Math.random() * 100) + 1;
+                    num2 = Math.floor(Math.random() * 100) + 1;
+                    break;
+            }
+
+            const operation = operations[Math.floor(Math.random() * operations.length)];
+
+            let questionText = '';
+            let correctAnswer = 0;
+
+            switch (operation) {
+                case '+':
+                    questionText = `${num1} + ${num2}`;
+                    correctAnswer = num1 + num2;
+                    break;
+                case '-':
+                    questionText = `${num1} - ${num2}`;
+                    correctAnswer = num1 - num2;
+                    break;
+                case '*':
+                    questionText = `${num1} * ${num2}`;
+                    correctAnswer = num1 * num2;
+                    break;
+                case '/':
+                    questionText = `${num1} / ${num2}`;
+                    correctAnswer = (num1 / num2).toFixed(2);
+                    break;
+            }
+
+            currentQuestion = {
+                text: questionText,
+                answer: correctAnswer
+            };
+
+            questionElement.textContent = `Soal ${questionNumber}: Berapa hasil dari ${questionText}?`;
+        }
+
+        function checkAnswer() {
+            const userAnswer = parseFloat(answerElement.value);
+            if (userAnswer === parseFloat(currentQuestion.answer)) {
+                resultMessageElement.textContent = 'Jawaban benar!';
+                score++;
+                correctCount++;
+            } else {
+                resultMessageElement.textContent = 'Jawaban salah!';
+                wrongCount++;
+            }
+
+            correctAnswerElement.textContent = currentQuestion.answer;
+            userAnswerElement.textContent = userAnswer;
+
+            scoreElement.textContent = score;
+            correctCountElement.textContent = correctCount;
+            wrongCountElement.textContent = wrongCount;
+
+            gameElement.classList.add('hidden');
+            resultElement.classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            answerElement.value = '';
+            gameElement.classList.remove('hidden');
+            resultElement.classList.add('hidden');
+            questionNumber++;
+            generateQuestion();
+        }
+
+        function resetScore() {
+            score = 0;
+            correctCount = 0;
+            wrongCount = 0;
+            questionNumber = 1;
+            scoreElement.textContent = score;
+            correctCountElement.textContent = correctCount;
+            wrongCountElement.textContent = wrongCount;
+            generateQuestion();
+        }
+
+        loginButton.addEventListener('click', () => {
+            playerName = document.getElementById('username').value;
+            playerNameElement.textContent = playerName;
+            loginCard.classList.add('hidden');
+            difficultyCard.classList.remove('hidden');
+            backgroundMusic.play();
+        });
+
+        easyButton.addEventListener('click', () => {
+            difficulty = 'easy';
+            difficultyCard.classList.add('hidden');
+            gameCard.classList.remove('hidden');
+            generateQuestion();
+        });
+
+        mediumButton.addEventListener('click', () => {
+            difficulty = 'medium';
+            difficultyCard.classList.add('hidden');
+            gameCard.classList.remove('hidden');
+            generateQuestion();
+        });
+
+        hardButton.addEventListener('click', () => {
+            difficulty = 'hard';
+            difficultyCard.classList.add('hidden');
+            gameCard.classList.remove('hidden');
+            generateQuestion();
+        });
+
+        submitButton.addEventListener('click', checkAnswer);
+        nextButton.addEventListener('click', nextQuestion);
+        resetScoreButton.addEventListener('click', resetScore);
+
+        generateQuestion();
+    </script>
+</body>
+</html>
